@@ -18,7 +18,7 @@ interface AddUserArgs {
   }
 }
 
-interface LoginUserArgs {
+interface LoginArgs {
   email: string;
   password: string;
 }
@@ -70,7 +70,7 @@ const resolvers = {
       return { token, user };
     },
 
-    login: async (_parent: any, { email, password }: LoginUserArgs) => {
+    login: async (_parent: any, { email, password }: LoginArgs) => {
       // Find a user with the provided email
       const user = await User.findOne({ email });
 
