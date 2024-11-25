@@ -14,14 +14,13 @@ import { searchGoogleBooks } from '../utils/API';
 import { saveBookIds, getSavedBookIds } from '../utils/localStorage';
 import type { Book } from '../models/Book';
 import type { GoogleAPIBook } from '../models/GoogleAPIBook';
-
-import { useMutation } from '@apollo/client';
+import { useMutation
+  // , useQuery
+ } from '@apollo/client';
+// import { SAVE_BOOK } from '../utils/queries';
 import { SAVE_BOOK } from '../utils/mutations';
 
 const SearchBooks = () => {
-
-  // initialize savebook mutation
-  const [saveBook] = useMutation(SAVE_BOOK);
   // create state for holding returned google api data
   const [searchedBooks, setSearchedBooks] = useState<Book[]>([]);
   // create state for holding our search field data
@@ -67,35 +66,34 @@ const SearchBooks = () => {
       console.error(err);
     }
   };
-
+  const [ saveBook, { error }]= useMutation(SAVE_BOOK);
   // create function to handle saving a book to our database
   const handleSaveBook = async (bookId: string) => {
-    const bookToSave = searchedBooks.find((book) => book.bookId === bookId);
+    // find the book in `searchedBooks` state by the matching id
+    const bookToSave: Book = searchedBooks.find((book) => book.bookId === bookId)!;
 
-    if (!bookToSave) {
-      return;
-    }
+    // get token
+    const token = Auth.loggedIn() ? Auth.getToken() : null;
 
-    if (!Auth.loggedIn()) {
+    if (!token) {
       return false;
     }
+
+console.log(bookToSave);
 
     try {
       await saveBook({
         variables: {
-          bookData: {
-            bookId: bookToSave.bookId,
-            authors: bookToSave.authors,
-            description: bookToSave.description,
-            title: bookToSave.title,
-            image: bookToSave.image,
-            link: bookToSave.link,
-          },
-        },
+          input: { ...bookToSave }
+        }
       });
 
+      // if (error) {
+      //   throw new Error('something went wrong!');
+      // }
+
+      // if book successfully saves to user's account, save book id to state
       setSavedBookIds([...savedBookIds, bookToSave.bookId]);
-      saveBookIds([...savedBookIds, bookToSave.bookId]);
     } catch (err) {
       console.error(err);
     }
@@ -154,6 +152,7 @@ const SearchBooks = () => {
                         {savedBookIds?.some((savedBookId: string) => savedBookId === book.bookId)
                           ? 'This book has already been saved!'
                           : 'Save this Book!'}
+                          {error && <div>Something went wrong...</div>}
                       </Button>
                     )}
                   </Card.Body>

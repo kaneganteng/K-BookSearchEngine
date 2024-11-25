@@ -1,46 +1,53 @@
-const gql = String.raw;
+import gql from 'graphql-tag';
 
 const typeDefs = gql`
-  type Query {
-    me: User
-  }
-
-  type Mutation {
-    login(email: String!, password: String!): Auth
-    addUser(username: String!, email: String!, password: String!): Auth
-    saveBook(input: SaveBookInput!): User
-    removeBook(bookId: String!): User
+  type Book {
+    bookId: String!
+    title: String!
+    authors: [String]
+    description: String!
+    image: String
+    link: String
   }
 
   type User {
-    _id: ID!
+    _id: ID
     username: String!
     email: String!
-    bookCount: Int
+    password: String!
     savedBooks: [Book]
   }
 
-  type Book {
-    bookId: String!
+  input BookInput{
     authors: [String]
-    description: String
-    title: String
+    bookId: String!
+    title: String!
+    description: String!
     image: String
     link: String
   }
 
   type Auth {
-    token: String!
+    token: ID!
     user: User
   }
 
-  input SaveBookInput {
-    bookId: String!
-    authors: [String]
-    description: String
-    title: String
-    image: String
-    link: String
+  input UserInput {
+    username: String!
+    email: String!
+    password: String!
+  }
+
+  type Query {
+    me: User
+  }
+
+  type Mutation {
+    addUser(input: UserInput!): Auth
+    login(email: String!, password: String!): Auth
+
+    saveBook(input: BookInput!): User
+    removeBook(bookId: ID!): User
   }
 `;
 
