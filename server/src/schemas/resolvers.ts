@@ -16,15 +16,6 @@ interface LoginUserArgs {
     password: string;
 }
 
-// interface BookArgs {
-// bookId: string;
-// title: string;
-// authors: [string];
-// description: string;
-// image: string;
-// link: string;
-// }
-
 interface SaveBookArgs {
     input: {
         authors: [string];
@@ -90,8 +81,7 @@ const resolvers = {
         },
         saveBook: async (_parent: any, { input }: SaveBookArgs, context: any) => {
             if (context.user) {
-                // const book = await Book.create({ ...input });
-
+        
                 const updatedUser = await User.findOneAndUpdate(
                     { _id: context.user._id },
                     { $addToSet: { savedBooks: input } },
@@ -107,14 +97,7 @@ const resolvers = {
             ('You need to be logged in!');
         },
         removeBook: async (_parent: any, { bookId }: RemoveBookArgs, context: any) => {
-            if (context.user) {
-                // const book = await Book.findOneAndDelete({
-                //     bookId: bookId,
-                // });
-
-                // if(!book){
-                //   throw AuthenticationError;
-                // }
+            if (context.user) {               
                 const updatedUser =
                     await User.findOneAndUpdate(
                         { _id: context.user._id },

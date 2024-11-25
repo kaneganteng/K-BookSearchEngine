@@ -1,55 +1,55 @@
-// see SignupForm.js for comments
 import { useState } from 'react';
 import type { ChangeEvent, FormEvent } from 'react';
 import { Form, Button, Alert } from 'react-bootstrap';
-
-// import { loginUser } from '../utils/API';
 import { LOGIN_USER } from '../utils/mutations';
 import { useMutation } from '@apollo/client';
 import Auth from '../utils/auth';
 import type { User } from '../models/User';
 
-// biome-ignore lint/correctness/noEmptyPattern: <explanation>
+
 const LoginForm = ({}: { handleModalClose: () => void }) => {
-  const [userFormData, setUserFormData] = useState<User>({ username: '', email: '', password: '', savedBooks: [] });
+  // State to manage the user's form data
+  const [userFormData, setUserFormData] = useState<User>({ 
+    username: '', 
+    email: '', 
+    password: '', 
+    savedBooks: [] // An empty array  for saved book when the account initially created
+  });
   const [validated] = useState(false);
   const [showAlert, setShowAlert] = useState(false);
 
+  // Function to handle input changes for the form fields
   const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = event.target;
-    setUserFormData({ ...userFormData, [name]: value });
+    const { name, value } = event.target; // Destructuring the name and value from the event target
+    setUserFormData({ ...userFormData, [name]: value }); // update the specific field in the form data
   };
 
   const [ login ] = useMutation(LOGIN_USER)
 
+  // Function that handles for submission
   const handleFormSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
+    event.preventDefault(); // Prevent the default form submission behavior
 
     // check if form has everything (as per react-bootstrap docs)
     const form = event.currentTarget;
     if (form.checkValidity() === false) {
-      event.preventDefault();
-      event.stopPropagation();
+      event.preventDefault(); // Prevent further actions if the form is invalid
+      event.stopPropagation();  
     }
 
     try {
-      // const response = await loginUser(userFormData);
-
-      // if (!response.ok) {
-      //   throw new Error('something went wrong!');
-      // }
-
+     // using the userformdata as variables to call the login_user mutation
       const { data } = await login({
         variables: { ...userFormData }
       })
-
-      // const { token } = await response.json();
+      
       Auth.login(data.login.token);
     } catch (err) {
       console.error(err);
       setShowAlert(true);
     }
 
+    // The default state of the form after submission and before submission
     setUserFormData({
       username: '',
       email: '',
