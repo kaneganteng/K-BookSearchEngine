@@ -6,10 +6,10 @@ import { GET_ME } from '../utils/queries';
 import { REMOVE_BOOK } from '../utils/mutations';
 import { useQuery, useMutation } from '@apollo/client';
 const SavedBooks = () => {
-
+  // fethc user data using the GET_ME query and assigns it to userData
   const { data } = useQuery(GET_ME);
   const userData: User = data?.me || { username: '', email: '', password: '', savedBooks: [] };
-
+  // prepares the REMOVE_BOOK mutation to delete a book by bookId
   const [removeBook, { error }] = useMutation(REMOVE_BOOK)
 
   // create function that accepts the book's mongo _id value as param and deletes the book from the database
@@ -34,7 +34,7 @@ const SavedBooks = () => {
     }
   };
 
-  // if data isn't here yet, say so
+  // 
   if (!removeBook) {
     return <h2>LOADING...</h2>;
   }
